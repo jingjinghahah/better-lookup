@@ -1,21 +1,23 @@
 {
     "compilerOptions": {
+        "outDir": "./dist",
+        "target": "ES2017",
         "module": "commonjs",
-        "target": "es2015",
-        "preserveConstEnums": true,
-        "rootDir": "src/",
-        "outDir": "dist/",
-        "experimentalDecorators": true,
-        "newLine": "LF",
-        "noUnusedParameters": false,
-        "noUnusedLocals": true,
-        "importHelpers": true,
-        "pretty": true,
-        "removeComments": true,
-        "sourceMap": true,
-        "noImplicitThis": true
+        "strict": true,
+        "lib": [
+            "es2017",
+            "dom",
+            "ES2020.Promise"
+        ],
+        "typeRoots": [
+            "./src/typings",
+            "./node_modules/@types"
+        ],
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "allowSyntheticDefaultImports": true
     },
     "include": [
-        "./src/*.ts"
+        "src/**/*",
     ]
 }

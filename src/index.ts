@@ -7,7 +7,7 @@ import { promisify } from "util";
 import useThrottle from "@hyurl/utils/useThrottle";
 import isEmpty from "@hyurl/utils/isEmpty";
 import timestamp from "@hyurl/utils/timestamp";
-
+import * as rr from "rr";
 type AddressInfo = { address: string, family: 4 | 6; };
 type AddressInfoDetail = AddressInfo & { expireAt: number; };
 type LookupCallback<T extends string | AddressInfo[]> = (
@@ -20,7 +20,7 @@ const readFile = promisify(fs.readFile);
 const resolve4 = promisify(dns.resolve4);
 const resolve6 = promisify(dns.resolve6);
 const hostsThrottle = useThrottle("dnsLookup:loadHostsConfig", 10_000);
-const _createConnection = Symbol("_createConnection");
+const _createConnection = "_createConnection";
 const Cache: Record<string, AddressInfoDetail[]> = {};
 
 var HostsConfig: Record<string, AddressInfoDetail[]>;
@@ -130,7 +130,7 @@ export function lookup(
         }
     }
 
-    let query: Promise<AddressInfo[]>;
+    let query;
 
     // If local cache contains records of the target hostname, try to retrieve
     // them and prevent network query.
@@ -144,6 +144,7 @@ export function lookup(
 
         if (!isEmpty(addresses)) {
             query = Promise.resolve(addresses);
+            console.log(`[better-loopup]: ${hostname}, cache`);
         }
     }
 
@@ -158,13 +159,14 @@ export function lookup(
             }
 
             let result: AddressInfoDetail[] = HostsConfig[hostname] || [];
-            let err4: NodeJS.ErrnoException;
-            let err6: NodeJS.ErrnoException;
+            let err4;
+            let err6;
 
             if (isEmpty(result)) {
                 if (!family || family === 4) {
                     try {
                         let records = await resolve4(hostname, { ttl: true });
+                        console.log(`[better-loopup]: ${hostname}, resolve4`);
                         let now = timestamp();
                         let addresses = records.map(record => ({
                             address: record.address,
@@ -185,7 +187,7 @@ export function lookup(
                         } else {
                             Cache[hostname] = addresses;
                         }
-                    } catch (e) {
+                    } catch (e: any) {
                         err4 = e;
                     }
                 }
@@ -193,6 +195,7 @@ export function lookup(
                 if (!family || family === 6) {
                     try {
                         let records = await resolve6(hostname, { ttl: true });
+                        console.log(`[better-loopup]: ${hostname}, resolve6`);
                         let now = timestamp();
                         let addresses = records.map(record => ({
                             address: record.address,
@@ -211,7 +214,7 @@ export function lookup(
                         } else {
                             Cache[hostname] = addresses;
                         }
-                    } catch (e) {
+                    } catch (e: any) {
                         if (e.code === "ENODATA" &&
                             e.syscall === "queryAaaa" &&
                             family === 6
@@ -290,7 +293,7 @@ export function lookup(
                 }
             } else {
                 if (family) {
-                    return addresses.find(a => a.family === family).address;
+                    return addresses?.find(a => a.family === family)?.address;
                 } else {
                     return addresses[0].address;
                 }
@@ -308,11 +311,12 @@ export function lookup(
                 if (family) {
                     callback(
                         null,
-                        addresses.find(a => a.family === family).address,
+                        addresses?.find(a => a.family === family)?.address,
                         family
                     );
                 } else {
-                    callback(null, addresses[0].address, addresses[0].family);
+                    const address = rr(addresses);
+                    callback(null, address.address, address.family);
                 }
             }
         }).catch(err => {
@@ -346,13 +350,11 @@ export function install<T extends HttpAgent | HttpsAgent>(
     };
 
     if (typeof agent.createConnection === "function") {
-        if (!(_createConnection in agent)) {
-            agent[_createConnection] = agent.createConnection;
-            agent.createConnection = function (options, callback) {
-                tryAttach(options);
-                return agent[_createConnection](options, callback);
-            };
-        }
+        const tmp = agent.createConnection;
+        agent.createConnection = function (options, callback) {
+            tryAttach(options);
+            return tmp.call(agent, options, callback);
+        };
 
         return agent;
     } else if (isHttpsProxyAgent(agent)) {
