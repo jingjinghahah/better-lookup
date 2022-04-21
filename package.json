@@ -1,6 +1,6 @@
 {
   "name": "@tencent/better-lookup",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A better async DNS lookup function for Node.js that implements atomic cache operation.",
   "main": "dist/index.js",
   "scripts": {

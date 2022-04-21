@@ -168,7 +168,7 @@ export function lookup(
                         let records = await resolve4(hostname, { ttl: true });
                         console.log(`[better-loopup]: ${hostname}, resolve4`);
                         let now = timestamp();
-                        let addresses = records.map(record => ({
+                        let addresses = records.filter(record => record?.address).map(record => ({
                             address: record.address,
                             family: 4 as 4,
                             // In case the DNS refresh the record, we only allow
@@ -197,7 +197,7 @@ export function lookup(
                         let records = await resolve6(hostname, { ttl: true });
                         console.log(`[better-loopup]: ${hostname}, resolve6`);
                         let now = timestamp();
-                        let addresses = records.map(record => ({
+                        let addresses = records.filter(record => record?.address).map(record => ({
                             address: record.address,
                             family: 6 as 6,
                             expireAt: Math.max(record.ttl + now, 10)
@@ -223,6 +223,7 @@ export function lookup(
                                 let records = await resolve4(hostname, {
                                     ttl: true
                                 });
+                                records = records.filter(record => record?.address);
                                 let now = timestamp();
 
                                 result.push(...records.map(record => ({
