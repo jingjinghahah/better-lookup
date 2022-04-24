@@ -1,0 +1,64 @@
+{
+    "extends": [
+      "@tencent/eslint-config-halo/typescript",
+      "plugin:vue/base"
+    ],
+    "parser": "vue-eslint-parser",
+    "parserOptions": {
+      "project": "tsconfig.eslint.json",
+      "parser": "@typescript-eslint/parser",
+      "extraFileExtensions": [".vue"]
+    },
+    "plugins": [
+      "@typescript-eslint",
+      "vue"
+    ],
+    "rules": {
+      "import/extensions": "off",
+      "import/no-default-export": "off",
+      "no-restricted-syntax": "off",
+      "no-await-in-loop": "off",
+  
+      "no-param-reassign": "off",
+      "@typescript-eslint/member-ordering": "off",
+      "@typescript-eslint/naming-convention": "off",
+      "@typescript-eslint/require-await": "off",
+      "@typescript-eslint/no-shadow": "off",
+  
+      "@typescript-eslint/explicit-member-accessibility": "off",
+  
+      "no-useless-constructor": "error",
+      "eslint-comments/disable-enable-pair": "off",
+      "@typescript-eslint/no-empty-function": "off",
+      "@typescript-eslint/no-misused-promises": [
+        "error",
+        {
+          "checksVoidReturn": false
+        }
+      ]
+    },
+    "overrides": [
+      {
+        "files": "**/*.d.ts",
+        "rules": {
+          "no-useless-constructor": "off",
+          "@typescript-eslint/no-useless-constructor": "error",
+          "spaced-comment": ["error", "always", { "markers": ["/"] }]
+        }
+      },
+      {
+        "files": "**/*.js",
+        "rules": {
+          "@typescript-eslint/no-var-requires": "off",
+          "@typescript-eslint/no-require-imports" : "off"
+        }
+      },
+      {
+        "files": "**/*.vue",
+        "rules": {
+          "max-len": "off"
+        }
+      }
+    ]
+  }
+  
