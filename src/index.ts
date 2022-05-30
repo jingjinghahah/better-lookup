@@ -142,7 +142,7 @@ export function lookup(
 
     if (!isEmpty(addresses)) {
       query = Promise.resolve(addresses);
-      console.log(`[better-loopup]: ${hostname}, cache`);
+      console.log(`[better-lookup]: ${hostname}, cache`);
     } else {
       // 存储已经过期的缓存，供后面请求 dns 出错使用
       expiredCache = !family ? Cache[hostname] : Cache[hostname].filter(a => a.family === family);
@@ -183,7 +183,7 @@ export function lookup(
 async function getDnsByResolve(hostname: string, family: FamilyWithZero = 4) {
   const fun = family === 6 ? resolve6 : resolve4;
   const records = await fun(hostname, { ttl: true });
-  console.log(`[better-loopup]: ${hostname}, resolve${family}`);
+  console.log(`[better-lookup]: ${hostname}, resolve${family}`);
   const now = timestamp();
   const addresses = records.filter(record => record?.address).map(({ address, ttl }) => ({
     family,

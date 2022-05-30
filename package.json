@@ -1,6 +1,6 @@
 {
-  "name": "@tencent/better-lookup",
-  "version": "1.0.7",
+  "name": "better-lookup-sequence",
+  "version": "1.0.1",
   "description": "A better async DNS lookup function for Node.js that implements atomic cache operation.",
   "main": "dist/index.js",
   "types": "src/index.ts",
@@ -9,7 +9,8 @@
     "pretest": "tsc",
     "test": "mocha",
     "lint": "eslint --ext .ts .",
-    "lint:fix": "eslint --fix --ext .ts ."
+    "lint:fix": "eslint --fix --ext .ts .",
+    "publish": "npm publish --registry=https://registry.npmjs.org"
   },
   "repository": {
     "type": "git",
